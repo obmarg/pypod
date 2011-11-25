@@ -117,3 +117,9 @@ class Feed:
 				filename - The local filename of the file
 		"""
 		pass
+
+	def MarkAllAsDownloaded( self ):
+		for ( reference, link ) in self.downloadList:
+			self.history.append( reference )
+
+
