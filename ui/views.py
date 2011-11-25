@@ -1,5 +1,8 @@
 
+import os
+import mimetypes
 from jinja2 import Environment, FileSystemLoader
+from models import GetPodcastManager, PodcastManager, Podcast
 
 templatePath = "templates"
 
@@ -59,4 +62,10 @@ class TemplateView(BaseView):
 class Index(TemplateView):
     """ Index view """
     template = "index.tpl"
+
+    def GetData( self ):
+        pm = GetPodcastManager()
+        return {
+                'podcasts' : pm.GetPodcastList()
+                }
 
