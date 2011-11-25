@@ -1,12 +1,23 @@
 
 import BaseHTTPServer
 import cgi
+import sys,traceback
 #TODO: Uncomment this at some point when finished shit
 #from .urls import Urls
 import re
-from views import Index
+from views import Index, File, Folder
 
-Urls = [ ( re.compile(".*"), Index ) ]
+Urls = [ 
+        ( re.compile(r"^/$"), Index ),
+        ( re.compile( r"^/style.css$" ), File( "scripts/style.css" ) ),
+        ( re.compile( r"^/jquery.js$" ), File( "scripts/jquery/js/jquery-1.7.1.js" ) ),
+        ( re.compile( "^/jquery-ui.js$" ), File(
+        "scripts/jquery/js/jquery-ui-1.8.16.custom.min.js" ) ),
+        ( re.compile( "^/jquery-ui.css$" ), File(
+        "scripts/jquery/css/blitzer/jquery-ui-1.8.16.custom.css" ) ),
+        ( re.compile( "^/images/.*$" ), Folder(
+        "scripts/jquery/css/blitzer/images/", "/images/" ) ), 
+        ]
 
 class Handler( BaseHTTPServer.BaseHTTPRequestHandler ):
     urls = Urls
@@ -19,15 +30,16 @@ class Handler( BaseHTTPServer.BaseHTTPRequestHandler ):
             Return:
                 A Url handler function, or None
         """
+        print "URL: %s" % url
         for( regexp, view ) in self.urls:
             if regexp.match( self.path ):
+                print "matched %r" % regexp
                 return view
         return None
 
     def do_GET( self ):
         """ Handles GET requests from clients """
         view = self.CheckUrl( self.path )
-        view = self.urls[0][1]
         if view is None:
             self.Send404()
             return
@@ -42,6 +54,8 @@ class Handler( BaseHTTPServer.BaseHTTPRequestHandler ):
             return
         except Exception as e:
             self.Send500( str( e ) )
+            print "Server Error: "
+            traceback.print_exc(file=sys.stdout) 
             return
 
     def do_POST( self ):
