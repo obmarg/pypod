@@ -2,6 +2,7 @@
 import BaseHTTPServer
 import cgi
 import sys,traceback
+import urlparse
 from urls import Urls
 
 
@@ -44,6 +45,7 @@ class Handler( BaseHTTPServer.BaseHTTPRequestHandler ):
 
     def do_POST( self ):
         """ Handles POST requests from clients. """
+        print 
         return self.do_GET()
 
     def Send404( self, message=None ):
@@ -76,5 +78,19 @@ class Handler( BaseHTTPServer.BaseHTTPRequestHandler ):
         if message:
             self.wfile.write(": " + message )
         self.wfile.write("</body></html>")
+
+    def GetPostVars( self, expected=None ):
+        """ Gets post variables
+            Params:
+                expected - List of variables that are expected
+            Throws if an expected var is not found
+        """
+        l = int( self.headers['Content-Length'] )
+        pv = self.rfile.read( l )
+        v =  urlparse.parse_qs(pv)
+        for exp in expected:
+            if exp not in v or len( v[ exp ] ) != 1:
+                raise Exception( "Expected post variable not found: " + str( exp ) )
+        return v
 
 
