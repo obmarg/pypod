@@ -26,7 +26,6 @@ class PyPod:
         """
         self.server = Server( ipAddr, int( port ) )
         self.destPath = destPath
-        self.timer = threading.Timer( self.fetchInterval, self.RunFetch )
 
     def Run( self ):
         """ Runs the server """
@@ -73,6 +72,7 @@ class PyPod:
 
     def ScheduleFetch( self ):
         """ Schedules the next fetch """
+        self.timer = threading.Timer( self.fetchInterval, self.RunFetch )
         self.timer.start()
 
 
