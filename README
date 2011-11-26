@@ -1,7 +1,7 @@
 pypod - A simple python podcatcher with a web interface
 ---
 
-pypod is a simple podcatcher written in python, written with the intention of 
+pypod is a simple podcatcher written in python written with the intention of 
 running as a daemon on computers with no monitor, or where keeping a constant
 GUI running would be an inconvenience.
 
@@ -35,7 +35,7 @@ The easiest way to install pypod currently is with git.
 Navigate to the directory you would like to install to and run the following
 command:
 
-git clone <insertUrlHere>
+git clone git://github.com/obmarg/pypod.git 
 
 
 Running pypod
