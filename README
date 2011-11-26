@@ -1,0 +1,57 @@
+pypod - A simple python podcatcher with a web interface
+---
+
+pypod is a simple podcatcher written in python, written with the intention of 
+running as a daemon on computers with no monitor, or where keeping a constant
+GUI running would be an inconvenience.
+
+
+License
+---
+pypod is avaliable under a BSD license as detailed in the LICENSE file
+
+Though additionally if anyone does end up using this code I'd be happy to
+get some feedback, or just an email to let me know where it has ended up.
+
+
+Dependencies
+---
+pypod runs using python, so that will definitely be required.  It was developed
+for python 2.7, though may work under other versions.
+
+Additionally, the following python packages are required:
+	jinja2
+	feedparser
+
+Assuming python setuptools is installed, these can be installed by running:
+
+easy_install jinja2 feedparser
+
+
+Getting pypod
+---
+The easiest way to install pypod currently is with git.
+
+Navigate to the directory you would like to install to and run the following
+command:
+
+git clone <insertUrlHere>
+
+
+Running pypod
+---
+To run pypod, simply run pypod.py from the main pypod directory.
+
+Usage:
+	pypod.py <IpAddress> <Port> <Podcast Destination Directory>
+
+	IpAddress - The ip address pypod's admin webserver should run on
+	Port - The port pypods admin webserver should run on
+	Podcast Destination Directory - The root folder for the podcasts downloads
+
+
+Configuring pypod
+---
+To configure pypod, simply use a webbrowser to navigate to the ip address & port
+you specified on the command line.
+
