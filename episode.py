@@ -1,5 +1,8 @@
 
 import os
+import logging
+
+log = logging.getLogger()
 
 class Episode:
     def __init__( self, ref, name, url, filename ):
@@ -26,7 +29,9 @@ class Episode:
         if os.path.exists( destFile ) and not force:
             return
         try:
-            urllib.urlretrieve( link, destFile )
+            a = ( link, destFile )
+            log.debug( "Downloading %s to %s", *a )
+            urllib.urlretrieve( *a )
             self.history.append( reference )
             self.CallPostCommand( reference, link )
         except:

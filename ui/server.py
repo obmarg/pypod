@@ -1,5 +1,6 @@
 
 import BaseHTTPServer
+import threading
 from handler import Handler
 
 class Server:
@@ -8,10 +9,7 @@ class Server:
         self.httpd = BaseHTTPServer.HTTPServer( self.endpoint, Handler )
 
     def RunServer( self ):
-        #TODO: Spawn a thread
-        try:
-            self.httpd.serve_forever()
-        except KeyboardInterrupt:
-            self.httpd.socket.close()
-
-
+        self.httpd.serve_forever()
+    
+    def ShutdownServer( self ):
+        self.httpd.shutdown()

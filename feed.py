@@ -4,7 +4,10 @@ import feedparser
 import urllib
 import os
 import pickle
+import logging
 from episode import Episode
+
+log = logging.getLogger()
 
 class Feed:
     """ Class representing a single podcast feed """
@@ -25,6 +28,10 @@ class Feed:
         self.limit = limit
         self.postCommand = postCommand
         self.histFile = os.path.join( self.destPath, '.pypodhist' )
+
+    def IsNew( self ):
+        """ Checks if this feed is new """
+        return len( self.episodes ) == 0
 
     def LoadHistory( self ):
         """ Loads the download history """
@@ -92,7 +99,6 @@ class Feed:
                     linkData['type'] == u'audio/mpeg' or
                     linkData['href'][:-4] == u'.mp3'
                     ):
-                    print "Found link: " + linkData.href
                     return linkData.href
             raise Exception( "Link Not Found" )
 
@@ -107,7 +113,9 @@ class Feed:
             episode.Download( self.destPath )
             self.episodes.append( episode )
             CallPostCommand( episode )
-            
+        else:
+            log.debug( "No New Episodes" )
+
     def CallPostCommand( self, episode ):
         """ Call the post download command
             Params:
