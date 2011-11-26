@@ -9,5 +9,9 @@ class Server:
 
     def RunServer( self ):
         #TODO: Spawn a thread
-        self.httpd.serve_forever()
+        try:
+            self.httpd.serve_forever()
+        except KeyboardInterrupt:
+            self.httpd.socket.close()
+
 

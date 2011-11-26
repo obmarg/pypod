@@ -90,7 +90,20 @@
 				hide : 'slide',
 				buttons : {
 					"Add Podcast" : function(){
-						//TODO: Do something
+						//TODO: Verify shit
+						var name = $( "#name" ).val();
+                        var url = $( "#feedUrl" ).val();
+                        var downloadAll = $( "input[name=downloadAllRadio]:checked" ).index()
+						$.post( 
+							'api/addPodcast',
+							{ 'name' : name, 'url' : url, 'da' : downloadAll },
+							function( data ){
+								//TODO: Do something with the returned data
+								// For now though, just reload the page
+								location.reload()
+							}
+						);
+
 					},
 					"Cancel" : function(){
 						$( this ).dialog( "close" )
@@ -135,14 +148,10 @@
 		<div />
         <div id="podcastListContainer" ><ul id="podcastList">
 	        {% for p in podcasts %}
-                <li>{{ p.title }}</li>
+                <div class='ui-widget-content'>
+                    <li> {{ p.name }} </li><button class="deletePodcast"> Delete </button>
+                </div>
             {% endfor %}
-				<div class='ui-widget-content'>
-					<li> Test text 1 </li><button class="deletePodcast"> Delete </button>
-				</div>
-				<div class='ui-widget-content'>
-					<li> Test text 2 </li><button class="deletePodcast"> Delete </button>
-				</div>
         </ul></div>
 		<div id="addPodcastForm" title="Add Podcast">
 			<p class='validateTips'>All fields are required</p>
@@ -154,8 +163,8 @@
 				<label for="feedUrl">Feed URL</label>
 				<input type='text' name='feedUrl' id='feedUrl' class='text ui-widget-content ui-corner-all' />
 				<div id="podcastDownloadRadio">
-					<input type='radio' id="downloadOnlyNewPodcasts" name="radio" /><label for="downloadOnlyNewPodcasts">Download Only New Podcasts</label></input>
-					<input type='radio' id="downloadAllPodcasts" name="radio" /><label for="downloadAllPodcasts">Download All Avaliable Podcasts</label></input>
+					<input type='radio' id="downloadOnlyNewPodcasts" name="downloadAllRadio" /><label for="downloadOnlyNewPodcasts">Download Only New Podcasts</label></input>
+					<input type='radio' id="downloadAllPodcasts" name="downloadAllRadio" /><label for="downloadAllPodcasts">Download All Avaliable Podcasts</label></input>
 				</div>
 			</fieldset>
 			</form>

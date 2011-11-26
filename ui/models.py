@@ -2,7 +2,7 @@
 import pickle
 import os
 
-podcastFilename = "~/.pypodcasts"
+podcastFilename = os.path.expanduser( "~/.pypodcasts" )
 
 class Podcast(object):
     def __init__( self, feedUrl, name, downloadAll ):
@@ -13,24 +13,28 @@ class Podcast(object):
 class PodcastManager(object):
     def __init__( self ):
         self.podcasts = {}
-        self.maxId = 0
 
     def AddPodcast( self, podcast ):
-        self.podcasts[ self.maxId ] = podcast
-        self.maxId += 1
-
-    def PostLoad( self ):
-        self.maxId = max( self.podcasts.iterkeys ) + 1
+        if podcast.name in self.podcasts:
+            raise Exception( "Podcast by that name already exists" )
+        self.podcasts[ podcast.name ] = podcast
 
     def Save( self ):
-        pickle.dump( open( podcastFilename, 'w' ) )
+        pickle.dump( self, open( podcastFilename, 'w' ) )
 
     def GetPodcastList( self ):
+        print "Podcasts: "
+        for p in self.podcasts.itervalues():
+            print p.name
         return self.podcasts.itervalues()
 
 def GetPodcastManager():
     if not os.path.exists( podcastFilename ):
         return PodcastManager()
-    manager = pickle.load( open( podcastFilename, 'r' ) )
-    manager.PostLoad()
-    return manager
+    try:
+        manager = pickle.load( open( podcastFilename, 'r' ) )
+        return manager
+    except Exception as e:
+        print "Error loading podcast data: "
+        print e
+        return PodcastManager()

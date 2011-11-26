@@ -125,6 +125,19 @@ class Index(TemplateView):
 
 class AddPodcast(BaseView):
     """ View that handles an add podcast request """
+    
     def RunView( self ):
-        pass
-
+        args = self.handler.GetPostVars([
+            "url",
+            "name",
+            "da"
+            ])
+        pm = GetPodcastManager()
+        p = Podcast( 
+                args["url"][0],
+                args["name"][0],
+                args["da"][0] == "2" 
+                )
+        pm.AddPodcast( p )
+        pm.Save()
+        self.response.data = "OK!"
