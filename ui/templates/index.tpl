@@ -44,6 +44,11 @@
 			font-size: 62.5%;
 		}
 
+		#confirmDeleteDialog {
+			vertical-align: middle;
+			text-align: center;
+		}
+
 		#podcastDownloadRadio {
 			text-align: center;
 		}
@@ -117,13 +122,12 @@
 			$( "#confirmDeleteDialog" ).dialog({
 				autoOpen : false,
 				resizable : false,
-				height : 140,
 				modal : true,
 				buttons : {
-					"Confirm Delete" : function(){
+					"Yes" : function(){
 						//TODO: Do delete
 					},
-					"Cancel" : function(){
+					"No" : function(){
 						$( this ).dialog( "close" );
 					}
 				}
@@ -169,10 +173,8 @@
 			</fieldset>
 			</form>
 		</div>
-		<div id="confirmDeleteDialog" title="Are you sure you want to delete?">
-			<p><span class='ui-icon ui-icon-alert' style='float:left; margin 0 7px 20px 0;'></span>
-				Are you sure you want to delete this podcast?
-			</p>
+		<div id="confirmDeleteDialog" title="Confirm Delete?">
+			Are you sure you want to delete this podcast?
 		</div>
 	</body>
 </html>
