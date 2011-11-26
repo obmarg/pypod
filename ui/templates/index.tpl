@@ -115,6 +115,9 @@
 						$( this ).dialog( "close" );
 					}
 				},
+                open : function(){
+                    addPodcastFields.val( "" ).removeClass( "ui-state-error" );
+                },
 				close : function(){
 					addPodcastFields.val( "" ).removeClass( "ui-state-error" );
 				}
