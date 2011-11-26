@@ -60,6 +60,7 @@
 		.validateTips { border: 1px solid transparent; padding: 0.3em; }
     </style>
 	<script type='text/javascript'>
+        var currentDelete = "";
 		$(function(){
 			$( "#addPodcast" ).button({
 				text : false,
@@ -105,13 +106,13 @@
 							function( data ){
 								//TODO: Do something with the returned data
 								// For now though, just reload the page
-								location.reload()
+								location.reload();
 							}
 						);
-
+                        $( this ).dialog( "close" );
 					},
 					"Cancel" : function(){
-						$( this ).dialog( "close" )
+						$( this ).dialog( "close" );
 					}
 				},
 				close : function(){
@@ -125,9 +126,19 @@
 				modal : true,
 				buttons : {
 					"Yes" : function(){
-						//TODO: Do delete
+                        $.post(
+                            'api/removePodcast',
+                            { 'name' : currentDelete },
+                            function( data ){
+                                //Do something and refresh.
+                                // For now, just refresh
+                                location.reload();
+                            }
+                        );
+                        $( this ).dialog( "close" );
 					},
 					"No" : function(){
+                        currentDelete = ""
 						$( this ).dialog( "close" );
 					}
 				}
@@ -140,6 +151,7 @@
 			});
 
 			$( ".deletePodcast" ).click( function(){
+                currentDelete = $( this ).attr( "name" );
 				$( "#confirmDeleteDialog" ).dialog( "open" );
 			});
 		});
@@ -153,7 +165,7 @@
         <div id="podcastListContainer" ><ul id="podcastList">
 	        {% for p in podcasts %}
                 <div class='ui-widget-content'>
-                    <li> {{ p.name }} </li><button class="deletePodcast"> Delete </button>
+                    <li> {{ p.name }} </li><button class="deletePodcast" name="{{ p.name }}" > Delete </button>
                 </div>
             {% endfor %}
         </ul></div>

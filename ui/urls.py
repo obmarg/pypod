@@ -1,6 +1,6 @@
 
 import re
-from views import Index, AddPodcast
+from views import Index, AddPodcast, RemovePodcast
 from baseviews import File, Folder
 
 class Url(object):
@@ -22,6 +22,7 @@ class Url(object):
 Urls = [ 
         Url( r"^/$", Index ),
         Url( r"^/api/addPodcast$", AddPodcast ),
+        Url( r"^/api/removePodcast$", RemovePodcast ),
         Url( r"^/style.css$", File( "scripts/style.css" ) ),
         Url( r"^/jquery.js$", File( "scripts/jquery/js/jquery-1.7.1.js" ) ),
         Url( r"^/jquery-ui.js$", File( "scripts/jquery/js/jquery-ui-1.8.16.custom.min.js" ) ),

@@ -30,3 +30,16 @@ class AddPodcast(BaseView):
         pm.AddPodcast( p )
         pm.Save()
         self.response.data = "OK!"
+
+class RemovePodcast(BaseView):
+    """ View that handles a remove podcast request """
+
+    def RunView( self ):
+        args = self.handler.GetPostVars([
+            "name"
+            ])
+        pm = GetPodcastManager()
+        pm.RemovePodcast( args["name"][0] )
+        pm.Save()
+        self.response.data = "OK!"
+

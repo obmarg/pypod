@@ -21,6 +21,12 @@ class PodcastManager(object):
             raise Exception( "Podcast by that name already exists" )
         self.podcasts[ podcast.name ] = podcast
 
+    def RemovePodcast( self, name ):
+        if name not in self.podcasts:
+            raise Exception( "Podcast by that name does not exist" )
+        #TODO: Would be good to delete the pypod podcast data files here
+        del self.podcasts[ name ]
+
     def Save( self ):
         pickle.dump( self, open( podcastFilename, 'w' ) )
 
