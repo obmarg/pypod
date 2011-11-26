@@ -62,12 +62,9 @@ class PyPod:
                 downloadAll - True if all history should be downloaded
         """
         feed.LoadHistory()
-        log.debug( "History loaded" )
         markAllRead = feed.IsNew() and not downloadAll
         feed.FetchFeed()
-        log.debug( "Feed fetched. %i new", len( feed.downloadList ) )
         if markAllRead:
-            log.info( "Marking all as Downloaded" )
             feed.MarkAllAsDownloaded()
         else:
             feed.DownloadFiles()

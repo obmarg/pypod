@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import feedparser
-import urllib
 import os
 import pickle
 import logging
@@ -35,17 +34,24 @@ class Feed:
 
     def LoadHistory( self ):
         """ Loads the download history """
-        if os.path.exists( self.destPath ):
-            if os.path.exists( self.histFile ):
-                try:
-                    self.episodes = pickle.load( open( self.histFile, 'r' ) )
-                except:
-                    pass
+        if not os.path.exists( self.destPath ):
+            return
+        if not os.path.exists( self.histFile ):
+            log.debug( "%s does not exist. Skipping loading", self.histFile )
+            return
+        with open( self.histFile, 'r') as f:
+            self.episodes = pickle.load( f )
+            log.debug( "Loaded %i episodes", len( self.episodes ) )
 
     def SaveHistory( self ):
         """ Saves the download history """
         if os.path.exists( self.destPath ):
-            pickle.dump( self.episodes, open( self.histFile, 'w' ) )
+            with open( self.histFile, 'w' ) as f:
+                log.debug( "Saving %i episodes", len( self.episodes ) )
+                pickle.dump( self.episodes, f )
+        else:
+            log.warning( "destPath doesn't exist, so not saving history" )
+            log.warning( "%s", self.destPath )
 
     def RunUpdate( self ):
         """ Runs an update of this feed """
@@ -54,18 +60,31 @@ class Feed:
         self.DownloadFiles()
         self.SaveHistory()
 
+    def HasEpisode( self, name ):
+        """ Checks if an episode has already been download
+            Params:
+                name - The name of the episode to look for
+            Returns True or False
+        """
+        return any( 
+            True for e in self.episodes 
+            if e.name == name
+            ) 
+
     def FetchFeed( self ):
         """ Fetches from the rss feed """
         result = feedparser.parse( self.url )
         for entry in result.entries:
-            if entry.title not in self.episodes:
-                try:
-                    self.AddToDownloadList(
-                        self.GetDownloadLink( entry ),
-                        entry.title
-                        )
-                except:
-                    pass
+            if not self.HasEpisode( entry.title ): 
+                epUrl = self.GetDownloadUrl( entry )
+                if not epUrl:
+                    continue
+                self.AddToDownloadList( epUrl, entry.title )
+        log.debug( 
+                "Feed fetched.  %i total, %i new",
+                len( result.entries ),
+                len( self.downloadList )
+                )
 
     def AddToDownloadList( self, link, reference ):
         """ Adds a link and reference to the download list
@@ -82,14 +101,12 @@ class Feed:
                     os.path.basename( link )
                     ) )
 
-    def GetDownloadLink( self, entry ):
-        """ Gets the mp3 download link from an rss entry
+    def GetDownloadUrl( self, entry ):
+        """ Gets the mp3 download url from an rss entry
             Params:
                 entry - the rss entry
             Returns:
-                A link if any
-            Throws:
-                Exception if none found
+                The url (or None) 
         """
         if entry.link and entry.link[:4] == u'.mp3':
             return entry.link
@@ -100,7 +117,11 @@ class Feed:
                     linkData['href'][:-4] == u'.mp3'
                     ):
                     return linkData.href
-            raise Exception( "Link Not Found" )
+        log.info( 
+                "No download link found for %s",
+                entry.title
+                )
+        return
 
     def DownloadFiles( self ):
         """ Downloads each of the files in downloadList """
@@ -110,9 +131,13 @@ class Feed:
         if self.limit != 0:
             limit = self.limit
         for episode in self.downloadList[limit:]:
-            episode.Download( self.destPath )
-            self.episodes.append( episode )
-            CallPostCommand( episode )
+            try:
+                episode.Download( self.destPath )
+                self.episodes.append( episode )
+                CallPostCommand( episode )
+            except:
+                pass
+                """ TODO: print traceback """
         else:
             log.debug( "No New Episodes" )
 
@@ -124,6 +149,7 @@ class Feed:
         pass
 
     def MarkAllAsDownloaded( self ):
+        log.info( "Marking all as Downloaded" )
         for episode in self.downloadList:
             self.episodes.append( episode )
 
