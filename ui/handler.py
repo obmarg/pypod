@@ -2,22 +2,8 @@
 import BaseHTTPServer
 import cgi
 import sys,traceback
-#TODO: Uncomment this at some point when finished shit
-#from .urls import Urls
-import re
-from views import Index, File, Folder
+from urls import Urls
 
-Urls = [ 
-        ( re.compile(r"^/$"), Index ),
-        ( re.compile( r"^/style.css$" ), File( "scripts/style.css" ) ),
-        ( re.compile( r"^/jquery.js$" ), File( "scripts/jquery/js/jquery-1.7.1.js" ) ),
-        ( re.compile( "^/jquery-ui.js$" ), File(
-        "scripts/jquery/js/jquery-ui-1.8.16.custom.min.js" ) ),
-        ( re.compile( "^/jquery-ui.css$" ), File(
-        "scripts/jquery/css/blitzer/jquery-ui-1.8.16.custom.css" ) ),
-        ( re.compile( "^/images/.*$" ), Folder(
-        "scripts/jquery/css/blitzer/images/", "/images/" ) ), 
-        ]
 
 class Handler( BaseHTTPServer.BaseHTTPRequestHandler ):
     urls = Urls
@@ -30,11 +16,9 @@ class Handler( BaseHTTPServer.BaseHTTPRequestHandler ):
             Return:
                 A Url handler function, or None
         """
-        print "URL: %s" % url
-        for( regexp, view ) in self.urls:
-            if regexp.match( self.path ):
-                print "matched %r" % regexp
-                return view
+        for url in self.urls:
+            if url.Matches( self.path ):
+                return url.view
         return None
 
     def do_GET( self ):
@@ -60,7 +44,7 @@ class Handler( BaseHTTPServer.BaseHTTPRequestHandler ):
 
     def do_POST( self ):
         """ Handles POST requests from clients. """
-        pass
+        return self.do_GET()
 
     def Send404( self, message=None ):
         """ Sends a 404 Error Back to the client

@@ -123,3 +123,8 @@ class Index(TemplateView):
                 'podcasts' : pm.GetPodcastList()
                 }
 
+class AddPodcast(BaseView):
+    """ View that handles an add podcast request """
+    def RunView( self ):
+        pass
+
