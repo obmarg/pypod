@@ -5,6 +5,7 @@ import traceback
 import sys
 import threading
 import logging
+import argparse
 from feed import Feed
 from ui.server import Server
 from ui.models import GetPodcastManager
@@ -23,7 +24,7 @@ class PyPod:
                 port - The port to run the ui on
                 destPath - The root folder to download to
         """
-        self.server = Server( ipAddr, port )
+        self.server = Server( ipAddr, int( port ) )
         self.destPath = destPath
         self.timer = threading.Timer( self.fetchInterval, self.RunFetch )
 
@@ -77,7 +78,17 @@ class PyPod:
 
 if __name__ == "__main__":
     logging.basicConfig( level=logging.INFO )
-    p = PyPod( "192.168.5.100", 8888, "/mnt/stuff/Podcasts & Mixes/" )
+    argParser = argparse.ArgumentParser( 
+        description="Basic Python Podcatcher"
+        )
+    argParser.add_argument(
+        'args',
+        metavar=( '<ip>', '<port>', '<download path>' ),
+        nargs=3
+        )
+    args = argParser.parse_args()
+
+    p = PyPod( *args.args )
     try:
         p.Run()
     except KeyboardInterrupt:
