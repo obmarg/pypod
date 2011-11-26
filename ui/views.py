@@ -1,5 +1,5 @@
 
-from baseViews import TemplateView, BaseView, BaseResponse
+from baseviews import TemplateView, BaseView, BaseResponse
 from models import GetPodcastManager, PodcastManager, Podcast
 
 class Index(TemplateView):

@@ -1,6 +1,7 @@
 
 import re
-from views import Index, File, Folder, AddPodcast
+from views import Index, AddPodcast
+from baseviews import File, Folder
 
 class Url(object):
     """ Object representing a URL """

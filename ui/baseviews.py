@@ -3,7 +3,8 @@ import os
 import mimetypes
 from jinja2 import Environment, FileSystemLoader
 
-templatePath = os.path.join( os.path.dirname( __file__ ), "templates" )
+basePath = os.path.dirname( __file__ )
+templatePath = os.path.join( basePath, "templates" )
 
 class BaseResponse:
     """ Basic http response class """
@@ -44,7 +45,7 @@ class FileView(BaseView):
         """
         self.mimetype = mimetypes.guess_type( filename )[0]
         super( FileView, self ).__init__( *pargs, **kwargs )
-        self.filename = filename
+        self.filename = os.path.join( basePath, filename )
 
     def RunView( self ):
         """ Reads in a file for data """
@@ -66,7 +67,7 @@ class FolderView(BaseView):
                 urlPrefix - The url prefix
         """
         super( FolderView, self ).__init__( *pargs, **kwargs )
-        self.path = path
+        self.path = os.path.join( basePath, path )
         self.urlPrefix = urlPrefix
 
     def RunView( self ):
