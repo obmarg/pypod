@@ -77,13 +77,26 @@
 
         existingNames = [];
         
-        function resetValidateTips( fields ) {
-            $( "#addPodcastBasicTips" ).text( 
-                "All fields are required" 
-                );
-            $( "#addPodcastAdvancedTips" ).text(
-                "Mouse over for help text"
-                );
+        function resetValidateTips( fields, which ) {
+            var updateBasic = true;
+            var updateAdvanced = true;
+            if ( which != undefined ) {
+                if ( which == 0 ) {
+                    updateAdvanced = false;
+                } else {
+                    updateBasic = false;
+                }
+            }
+            if( updateBasic ) {
+                $( "#addPodcastBasicTips" ).text( 
+                    "All fields are required" 
+                    );
+            }
+            if( updateAdvanced ) { 
+                $( "#addPodcastAdvancedTips" ).text(
+                    "Mouse over for help text"
+                    );
+            }
             if( fields ) {
                 fields.removeClass( 'ui-state-error' );
             }
@@ -91,7 +104,7 @@
 
         function validateName( name, resetTips ) {
             if( resetTips ) {
-                resetValidateTips( name );
+                resetValidateTips( name, 0 );
             }
             var ok = true;
             if( !name.val() ) {
@@ -111,7 +124,7 @@
 
         function validateUrl( url, resetTips ) {
             if( resetTips ) {
-                resetValidateTips( url );
+                resetValidateTips( url, 0 );
             }
             if( !url.val() )
             {
@@ -142,7 +155,7 @@
 
         function validateDestFilenameFormat( filenameFormat, resetTips ) {
             if( resetTips ) {
-                resetValidateTips( filenameFormat );
+                resetValidateTips( filenameFormat, 0 );
             }
             if( !filenameFormat.val() ) {
                 filenameFormat.addClass( 'ui-state-error' );
@@ -197,6 +210,18 @@
                 .add( "#downloadOnlyNewPodcasts" )
                 .add( "#downloadAllPodcasts" )
                 .add( "#destFilenameFormat" );
+
+            $( "#name" ).change(function(){
+                validateName( $( this ), true );
+            });
+
+            $( "#feedUrl" ).change(function(){
+                validateUrl( $( this ), true );
+            });
+
+            $( "#destFilenameFormat" ).change(function(){
+                validateDestFilenameFormat( $( this ), true );
+            });
 
             $( "#addPodcastForm" ).dialog({
                 autoOpen : false,
