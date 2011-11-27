@@ -9,6 +9,7 @@ import argparse
 from feed import Feed
 from ui.server import Server
 from ui.models import GetPodcastManager
+import history
 
 log = logging.getLogger()
 
@@ -26,6 +27,7 @@ class PyPod:
         """
         self.server = Server( ipAddr, int( port ) )
         self.destPath = destPath
+        self.timer = None
 
     def Run( self ):
         """ Runs the server """
@@ -42,17 +44,24 @@ class PyPod:
         """ Runs a fetch of all current podcasts """
         pm = GetPodcastManager()
         log.debug( "Loaded %i podcasts", len( pm.podcasts ) )
+        hist = history.Load()
         for podcast in pm.GetPodcastList():
+            if podcast.name not in hist:
+                hist[ podcast.name ] = []
             try:
-                f = Feed( 
+                f = Feed(
+                    podcast.name,
                     podcast.feedUrl,
-                    os.path.join( self.destPath, podcast.name )
+                    os.path.join( self.destPath ),
+                    hist[ podcast.name ],
+                    destFilenameFormat = podcast.destFilenameFormat
                     )
                 log.info( "Running fetch for %s", podcast.name )
                 self.FetchFeed( f, podcast.downloadAll )
             except Exception as e:
                 log.error( "Error when fetching %s", podcast.name )
                 traceback.print_exc(file=sys.stdout)
+        history.Save( hist )
         self.ScheduleFetch()
 
     def FetchFeed( self, feed, downloadAll ):
@@ -61,14 +70,12 @@ class PyPod:
                 feed - The feed to fetch
                 downloadAll - True if all history should be downloaded
         """
-        feed.LoadHistory()
         markAllRead = feed.IsNew() and not downloadAll
         feed.FetchFeed()
         if markAllRead:
             feed.MarkAllAsDownloaded()
         else:
             feed.DownloadFiles()
-        feed.SaveHistory()
 
     def ScheduleFetch( self ):
         """ Schedules the next fetch """

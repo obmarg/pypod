@@ -6,10 +6,19 @@ class Index(TemplateView):
     """ Index view """
     template = "index.tpl"
 
+    destFilenameFormatHelp = """
+        %filename% - The Original Download Filename
+        %title% - The Title Of The Podcast Episode
+        %podcastname% - The Podcast Name
+        """
+    defaultDestFilenameFormat = "%podcastname%/%filename%"
+
     def GetData( self ):
         pm = GetPodcastManager()
         return {
-                'podcasts' : pm.GetPodcastList()
+                'podcasts' : pm.GetPodcastList(),
+                'destFilenameFormatHelp' : self.destFilenameFormatHelp,
+                'defaultDestFilenameFormat' : self.defaultDestFilenameFormat
                 }
 
 class AddPodcast(BaseView):
@@ -19,13 +28,15 @@ class AddPodcast(BaseView):
         args = self.handler.GetPostVars([
             "url",
             "name",
-            "da"
+            "da",
+            "filenameFormat"
             ])
         pm = GetPodcastManager()
         p = Podcast( 
                 args["url"][0],
                 args["name"][0],
-                args["da"][0] == "2" 
+                args["da"][0] == "2",
+                args["filenameFormat"][0]
                 )
         pm.AddPodcast( p )
         pm.Save()

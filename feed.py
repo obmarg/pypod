@@ -11,54 +11,47 @@ log = logging.getLogger()
 class Feed:
     """ Class representing a single podcast feed """
 
-    def __init__( self, url, destPath, limit=None, postCommand=None ):
+    def __init__( 
+            self,
+            name,
+            url, 
+            destPath,
+            episodes,
+            limit=0, 
+            postCommand=None,
+            destFilenameFormat=None
+            ):
         """ Constructor
             Params:
+                name - The name of the podcast
                 url - The url of the feed
                 destPath - The path to download mp3 files to
+                episodes - A list of already downloaded episodes
                 limit - The max files to add to download 
                         list in one shot
                 postCommand - A command to be run on finishing
+                destFilenameFormat - The format for destination filenames
         """
+        self.name = name
         self.url = url
-        self.downloadList = []
-        self.episodes = []
         self.destPath = destPath
+        self.episodes = episodes
+        self.downloadList = []
         self.limit = limit
         self.postCommand = postCommand
-        self.histFile = os.path.join( self.destPath, '.pypodhist' )
+        if destFilenameFormat:
+            self.destFilenameFormat = destFilenameFormat.rstrip()
+        else:
+            self.destFilenameFormat = "%podcastname%/%filename%"
 
     def IsNew( self ):
         """ Checks if this feed is new """
         return len( self.episodes ) == 0
 
-    def LoadHistory( self ):
-        """ Loads the download history """
-        if not os.path.exists( self.destPath ):
-            return
-        if not os.path.exists( self.histFile ):
-            log.debug( "%s does not exist. Skipping loading", self.histFile )
-            return
-        with open( self.histFile, 'r') as f:
-            self.episodes = pickle.load( f )
-            log.debug( "Loaded %i episodes", len( self.episodes ) )
-
-    def SaveHistory( self ):
-        """ Saves the download history """
-        if os.path.exists( self.destPath ):
-            with open( self.histFile, 'w' ) as f:
-                log.debug( "Saving %i episodes", len( self.episodes ) )
-                pickle.dump( self.episodes, f )
-        else:
-            log.warning( "destPath doesn't exist, so not saving history" )
-            log.warning( "%s", self.destPath )
-
     def RunUpdate( self ):
         """ Runs an update of this feed """
-        self.LoadHistory()
         self.FetchFeed()
         self.DownloadFiles()
-        self.SaveHistory()
 
     def HasEpisode( self, name ):
         """ Checks if an episode has already been download
@@ -79,26 +72,32 @@ class Feed:
                 epUrl = self.GetDownloadUrl( entry )
                 if not epUrl:
                     continue
-                self.AddToDownloadList( epUrl, entry.title )
+                self.AddToDownloadList( 
+                        epUrl, 
+                        entry.title,
+                        self.MakeEpisodeFilename( 
+                            entry,
+                            epUrl
+                            ) )
         log.debug( 
                 "Feed fetched.  %i total, %i new",
                 len( result.entries ),
                 len( self.downloadList )
                 )
 
-    def AddToDownloadList( self, link, reference ):
+    def AddToDownloadList( self, link, title, destFilename ):
         """ Adds a link and reference to the download list
             Params:
                 link - The link to add
-                reference - A unique reference (id/title) 
-                            for the download
+                title - The title of this episode
+                destFilename - The destination filename
         """
         self.downloadList.append(
                 Episode( 
-                    reference,
-                    reference,
+                    title,
+                    title,
                     link,
-                    os.path.basename( link )
+                    destFilename
                     ) )
 
     def GetDownloadUrl( self, entry ):
@@ -127,12 +126,12 @@ class Feed:
         """ Downloads each of the files in downloadList """
         if not os.path.exists( self.destPath ):
             os.makedirs( self.destPath )
-        limit = self.downloadList
+        limit = len( self.downloadList )
         if self.limit != 0:
             limit = self.limit
-        for episode in self.downloadList[limit:]:
+        for episode in self.downloadList[:limit]:
             try:
-                episode.Download( self.destPath )
+                episode.Download()
                 self.episodes.append( episode )
                 CallPostCommand( episode )
             except:
@@ -149,8 +148,42 @@ class Feed:
         pass
 
     def MarkAllAsDownloaded( self ):
+        """ Marks everything in the downloaded list as downloaded """
         log.info( "Marking all as Downloaded" )
         for episode in self.downloadList:
             self.episodes.append( episode )
 
+    def MakeEpisodeFilename( self, entry, url=None ):
+        """ Makes a filename for an episode.
+            Params:
+                entry - The rss feed entry for this episode 
+                url - The url for this episode.
+                      Will be calculated if not set
+            Returns the destination filename, including full path    
+        """
+        if url == None:
+            url = self.MakeDownloadUrl( entry )
 
+        urlBasename = os.path.basename( url )
+        urlBasenameExt = urlBasename.rfind( '.' )
+        if urlBasenameExt != -1:
+            urlFilename = urlBasename[:urlBasenameExt]
+            urlExt = urlBasename[urlBasenameExt:]
+        else:
+            urlFilename = urlBasename
+            urlExt = ""
+
+        destFilenameSubs = [
+                ( '%filename%', urlFilename ),
+                ( '%title%', entry.title ),
+                ( '%podcastname%', self.name ),
+                ]
+
+        rv = self.destFilenameFormat
+        log.debug( "Initial filename: %s", rv )
+        for search, replace in destFilenameSubs:
+            rv = rv.replace( search, replace )
+            log.debug( "New filename: %s", rv )
+        rv = os.path.join( self.destPath, rv + urlExt )
+        log.debug( "Returning %s", rv )
+        return rv

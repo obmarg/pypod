@@ -12,24 +12,22 @@ class Episode:
                 ref - Unique reference
                 name - Name of episode
                 url - Remote url
-                filename - Local filename
+                filename - Destination filename (including path)
         """
         self.ref = ref
         self.name = name
         self.url = url
-        self.filename = filename
+        self.destFilename = filename
 
-    def Download( self, path, force=False ):
+    def Download( self, force=False ):
         """ Downloads the podcast, if not already done
             Params:
-                path - The destination path
                 force - If true, overwrite any existing
                         files
         """
-        destFile = os.path.join( path, self.filename )
-        if os.path.exists( destFile ) and not force:
+        if os.path.exists( self.destFilename ) and not force:
             return
-        args = ( self.url, destFile )
+        args = ( self.url, self.destFilename )
         try:
             log.debug( "Downloading %s to %s", *args )
             urllib.urlretrieve( *args )
