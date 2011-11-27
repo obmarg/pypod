@@ -140,6 +140,23 @@
             return true;
         }
 
+        function validateDestFilenameFormat( filenameFormat, resetTips ) {
+            if( resetTips ) {
+                resetValidateTips( filenameFormat );
+            }
+            if( !filenameFormat.val() ) {
+                filenameFormat.addClass( 'ui-state-error' );
+                updateTips(
+                    $( "#addPodcastAdvancedTips" ),
+                    "The podcast destination filename format can't be empty",
+                    1
+                    );
+                return false;
+            }
+            //TODO: Do further validation of this
+            return true;
+        }
+
         function validatePodcastFields( fields ) {
             resetValidateTips( fields );
             var rv = 
@@ -148,7 +165,8 @@
                 validateDownloadAll( 
                     $( "input[name=downloadAllRadio]:checked" ).index(),
                     false
-                    );
+                    ) &&
+                validateDestFilenameFormat( $( "#destFilenameFormat" ), false );
             return rv;
         }
 
