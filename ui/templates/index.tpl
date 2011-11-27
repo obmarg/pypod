@@ -62,7 +62,10 @@
         .validateTips { border: 1px solid transparent; padding: 0.3em; }
     </style>
     <script type='text/javascript'>
-        function updateTips( tips, text ) {
+        function updateTips( tips, text, tabIndex ) {
+            if( tabIndex != undefined ) {
+                $( "#addPodcastFormTabs" ).tabs( "select", tabIndex );
+            }
             tips
                 .text( text )
                 .addClass( 'ui-state-highlight' );
@@ -94,7 +97,8 @@
             if( !name.val() ) {
                 updateTips( 
                     $( "#addPodcastBasicTips" ),
-                    "Name must not be empty"
+                    "Name must not be empty",
+                    0
                     );
                 ok = false;
             }
@@ -114,7 +118,8 @@
                 url.addClass( "ui-state-error" );
                 updateTips(
                     $( "#addPodcastBasicTips" ),
-                    "Feed URL must not be empty"
+                    "Feed URL must not be empty",
+                    0
                     );
                 return false;
             }
@@ -127,7 +132,8 @@
             {
                 updateTips( 
                     $( "#addPodcastBasicTips" ),
-                    "You must select either download all or only new" 
+                    "You must select either download all or only new",
+                    0
                     );
                 return false;
             }
