@@ -126,17 +126,28 @@
             if( resetTips ) {
                 resetValidateTips( url, 0 );
             }
-            if( !url.val() )
+            if( !url.val() || 
+                ( 
+                    ( url.val().search( "http://" ) != 0 ) && 
+                    ( url.val().search( "https://") != 0 )
+                ) )
             {
                 url.addClass( "ui-state-error" );
                 updateTips(
                     $( "#addPodcastBasicTips" ),
-                    "Feed URL must not be empty",
+                    "Feed URL must begin with http:// or https://",
                     0
                     );
-                return false;
             }
-            //TODO: Check url begins with http or something
+            else if( url.val().length < 9 )
+            {
+                url.addClass( "ui-state-error" );
+                updateTips(
+                    $( "#addPodcastBasicTips" ),
+                    "Feed URL must contain a url",
+                    0
+                    );
+            }
             return true;
         }
         
@@ -155,7 +166,7 @@
 
         function validateDestFilenameFormat( filenameFormat, resetTips ) {
             if( resetTips ) {
-                resetValidateTips( filenameFormat, 0 );
+                resetValidateTips( filenameFormat, 1 );
             }
             if( !filenameFormat.val() ) {
                 filenameFormat.addClass( 'ui-state-error' );
@@ -166,7 +177,29 @@
                     );
                 return false;
             }
-            //TODO: Do further validation of this
+            else
+            {
+                var format = filenameFormat.val();
+                var ok = true;
+                if( format.search( "~" ) != -1 ) {
+                    ok = false;
+                }
+                if( format.search( "^/" ) != -1 ) {
+                    ok = false;
+                }
+                if( format.search( "\\.\\." ) != -1 ) {
+                    ok = false;
+                }
+                if( !ok ) {
+                    filenameFormat.addClass( "ui-state-error" );
+                    updateTips( 
+                        $( "#addPodcastAdvancedTips" ),
+                        "The podcast destination format must be a relative path",
+                        1
+                        );
+                    return false;
+                }
+            }
             return true;
         }
 
@@ -232,7 +265,6 @@
                 hide : 'slide',
                 buttons : {
                     "Add Podcast" : function(){
-                        //TODO: Verify shit
                         var name = $( "#name" ).val();
                         var url = $( "#feedUrl" ).val();
                         var downloadAll = 
