@@ -17,6 +17,7 @@ class Index(TemplateView):
         pm = GetPodcastManager()
         return {
                 'podcasts' : pm.GetPodcastList(),
+                'podcastNames' : [ p.name for p in pm.GetPodcastList() ],
                 'destFilenameFormatHelp' : self.destFilenameFormatHelp,
                 'defaultDestFilenameFormat' : self.defaultDestFilenameFormat
                 }

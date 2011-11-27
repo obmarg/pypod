@@ -75,7 +75,11 @@
             );
         }
 
-        existingNames = [];
+        {% if podcastNames|length > 0 %}
+        existingNames = [ '{{ podcastNames|join('\', \'') }}' ];
+        {% else %}
+        existingNames = []
+        {% endif %}
         
         function resetValidateTips( fields, which ) {
             var updateBasic = true;
@@ -106,20 +110,27 @@
             if( resetTips ) {
                 resetValidateTips( name, 0 );
             }
-            var ok = true;
+            var errMsg = ""
             if( !name.val() ) {
-                updateTips( 
+                errMsg = "Name must not be empty";
+            } else {
+                var nameStr = name.val();
+                for( var i = 0; i < existingNames.length; i++ ) {
+                    if( nameStr == existingNames[ i ] ) {
+                        errMsg = "There is already a podcast named " + nameStr;
+                    }
+                }
+            }
+            if( errMsg != "" ) {
+                name.addClass( "ui-state-error" );
+                updateTips(
                     $( "#addPodcastBasicTips" ),
-                    "Name must not be empty",
+                    errMsg,
                     0
                     );
-                ok = false;
+                return false;
             }
-            //TODO: Check if name already exists.
-            if( !ok ) {
-                name.addClass( "ui-state-error" );
-            }
-            return ok;
+            return true;
         }
 
         function validateUrl( url, resetTips ) {
