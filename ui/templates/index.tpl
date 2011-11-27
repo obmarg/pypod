@@ -62,30 +62,88 @@
         .validateTips { border: 1px solid transparent; padding: 0.3em; }
     </style>
     <script type='text/javascript'>
-        function updatePodcastBasicTips( text ) {
-            $( ".validateTips" )
+        function updateTips( tips, text ) {
+            tips
                 .text( text )
-                .addClass( "ui-state-highlight" );
-            setTimeout( function() {
-                $( ".validateTips" ).removeClass( "ui-state-highlight", 1500 );
-            }, 500 );
+                .addClass( 'ui-state-highlight' );
+            setTimeout(function(){
+                    tips.removeClass( 'ui-state-highlight', 1500 );
+                }, 500 
+            );
         }
 
-        function validatePodcastBasics( name, url, downloadAll ) {
-            if( name.val().legnth < 0 ) {
-                name.addClass( "ui-state-error" );
-                return false;
+        existingNames = [];
+        
+        function resetValidateTips( fields ) {
+            $( "#addPodcastBasicTips" ).text( 
+                "All fields are required" 
+                );
+            $( "#addPodcastAdvancedTips" ).text(
+                "Mouse over for help text"
+                );
+            if( fields ) {
+                fields.removeClass( 'ui-state-error' );
             }
-            if( url.val().legnth < 0 )
+        }
+
+        function validateName( name, resetTips ) {
+            if( resetTips ) {
+                resetValidateTips( name );
+            }
+            var ok = true;
+            if( !name.val() ) {
+                updateTips( 
+                    $( "#addPodcastBasicTips" ),
+                    "Name must not be empty"
+                    );
+                ok = false;
+            }
+            //TODO: Check if name already exists.
+            if( !ok ) {
+                name.addClass( "ui-state-error" );
+            }
+            return ok;
+        }
+
+        function validateUrl( url, resetTips ) {
+            if( resetTips ) {
+                resetValidateTips( url );
+            }
+            if( !url.val() )
             {
                 url.addClass( "ui-state-error" );
+                updateTips(
+                    $( "#addPodcastBasicTips" ),
+                    "Feed URL must not be empty"
+                    );
                 return false;
             }
+            //TODO: Check url begins with http or something
+            return true;
+        }
+        
+        function validateDownloadAll( downloadAll ) {
             if( downloadAll != 0 && downloadAll != 2 )
             {
+                updateTips( 
+                    $( "#addPodcastBasicTips" ),
+                    "You must select either download all or only new" 
+                    );
                 return false;
             }
             return true;
+        }
+
+        function validatePodcastFields( fields ) {
+            resetValidateTips( fields );
+            var rv = 
+                validateName( $("#name"), false ) &&
+                validateUrl( $("#feedUrl"), false ) && 
+                validateDownloadAll( 
+                    $( "input[name=downloadAllRadio]:checked" ).index(),
+                    false
+                    );
+            return rv;
         }
 
         var currentDelete = "";
@@ -115,7 +173,7 @@
                 .add( "#downloadOnlyNewPodcasts" )
                 .add( "#downloadAllPodcasts" )
                 .add( "#destFilenameFormat" );
-    
+
             $( "#addPodcastForm" ).dialog({
                 autoOpen : false,
                 height : 400,
@@ -132,6 +190,9 @@
                             $( "input[name=downloadAllRadio]:checked" ).index();
                         var filenameFormat = $( "#destFilenameFormat" ).val();
 
+                        if( !validatePodcastFields( addPodcastFields ) ) {
+                                return;
+                        }
                         $.post( 
                             'api/addPodcast',
                             { 
@@ -153,14 +214,16 @@
                     }
                 },
                 open : function(){
-                    addPodcastFields.val( "" ).removeClass( "ui-state-error" );
+                    addPodcastFields.val( "" );
                     $( "#destFilenameFormat" ).val( 
                         "{{ defaultDestFilenameFormat  }}" 
                         );
                     $( "#addPodcastFormTabs" ).tabs( "select", 0 );
+                    resetValidateTips( addPodcastFields );
                 },
                 close : function(){
-                    addPodcastFields.val( "" ).removeClass( "ui-state-error" );
+                    addPodcastFields.val( "" );
+                    resetValidateTips( addPodcastFields );
                 }
             });
 
@@ -222,7 +285,7 @@
                     <li><a href='#addPodcastAdvancedSettings'>Advanced Settings</a></li>
                 </ul>
                 <div id='addPodcastBasicSettings'>
-                    <p class='validateTips'>All fields are required</p>
+                    <p id='addPodcastBasicTips' class='validateTips'>SOMETHING:</p>
 
                     <form>
                     <fieldset>
@@ -266,9 +329,7 @@
                     </form>
                 </div>
                 <div id="addPodcastAdvancedSettings">
-                    <p class='validateTips'>
-                        All fields are required. Mouse-over for help text.
-                    </p>
+                    <p id="addPodcastAdvancedTips" class='validateTips' >SOMETHING:</p>
 
                     <form>
                     <fieldset>
