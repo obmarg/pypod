@@ -180,10 +180,12 @@ class Feed:
                 ]
 
         rv = self.destFilenameFormat
-        log.debug( "Initial filename: %s", rv )
         for search, replace in destFilenameSubs:
             rv = rv.replace( search, replace )
-            log.debug( "New filename: %s", rv )
         rv = os.path.join( self.destPath, rv + urlExt )
-        log.debug( "Returning %s", rv )
+        rv = os.path.normpath( rv )
+        if not rv.startswith( self.destPath ):
+            raise Exception( 
+                "MakeEpisodeFilename generated file outwith destination path" 
+                )
         return rv

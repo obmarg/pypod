@@ -26,7 +26,7 @@ class PyPod:
                 destPath - The root folder to download to
         """
         self.server = Server( ipAddr, int( port ) )
-        self.destPath = destPath
+        self.destPath = os.path.normpath( destPath )
         self.timer = None
 
     def Run( self ):
