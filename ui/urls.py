@@ -28,5 +28,7 @@ Urls = [
         Url( r"^/jquery-ui.js$", File( "scripts/jquery/js/jquery-ui-1.8.16.custom.min.js" ) ),
         Url( r"^/jquery-ui.css$", File( "scripts/jquery/css/blitzer/jquery-ui-1.8.16.custom.css" ) ),
         Url( r"^/images/.*$", Folder( "scripts/jquery/css/blitzer/images/", "/images/" ) ), 
+        Url( r"^/jquery.qtip.js", File( "scripts/jquery/js/jquery.qtip.min.js" ) ),
+        Url( r"^/jquery.qtip.css", File( "scripts/jquery/css/jquery.qtip.min.css" ) ),
         ]
 

@@ -5,7 +5,9 @@
         </title>
     <script type='text/javascript' src='jquery.js' ></script>
     <script type='text/javascript' src='jquery-ui.js' ></script>
+    <script type='text/javascript' src='jquery.qtip.js' ></script>
     <link rel='stylesheet' type='text/css' href='jquery-ui.css' />
+    <link rel='stylesheet' type='text/css' href='jquery.qtip.css' />
     </head>
     <style type='text/css'>
         html {
@@ -355,6 +357,11 @@
                 currentDelete = $( this ).attr( "name" );
                 $( "#confirmDeleteDialog" ).dialog( "open" );
             });
+
+            $( "input[title]" ).qtip({
+                tip : true
+            });
+
         });
     </script>
     <body>
@@ -431,7 +438,7 @@
                             id="destFilenameFormat" 
                             name="destFilenameFormat" 
                             class='text ui-widget-content ui-corner-all'
-                            title='The format for destination files. {{ destFilenameFormatHelp }}'
+                            title='The format for destination files. <br /> {{ destFilenameFormatHelp }}'
                             />
                     </fieldset>
                     </form>

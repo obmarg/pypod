@@ -6,11 +6,11 @@ class Index(TemplateView):
     """ Index view """
     template = "index.tpl"
 
-    destFilenameFormatHelp = """
-        %filename% - The Original Download Filename
-        %title% - The Title Of The Podcast Episode
-        %podcastname% - The Podcast Name
-        """
+    destFilenameFormatHelp = (
+        "    %filename% - The Original Download Filename<br />" +
+        "    %title% - The Title Of The Podcast Episode<br />" +
+        "    %podcastname% - The Podcast Name<br />"
+        )
     defaultDestFilenameFormat = "%podcastname%/%filename%"
 
     def GetData( self ):
